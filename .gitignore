@@ -1,0 +1,58 @@
+# ============================================================
+# Secrets and local credentials — never commit these files
+# ============================================================
+/APIKEY/
+**/APIKEY/
+**/secrets/
+**/*api-key*.md
+**/*apikey*.md
+
+.env
+.env.*
+!.env.example
+!**/.env.example
+!**/.env.*.example
+
+*.key
+*.pem
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+
+# Runtime data and logs may contain prompts, user data, or tool output
+logs/
+*.log
+runtime-data/
+traces/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / TypeScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Build, cache, and temporary files
+build/
+.cache/
+tmp/
+temp/
+*.tmp
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
