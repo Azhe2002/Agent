@@ -8,3 +8,4 @@ ADR 用于记录重要设计选择及其原因，避免项目迭代后只看到�
 
 - [0001：三个实现共享行为契约](0001-shared-contracts.md)
 - [0002：付费模型回退必须显式开启](0002-explicit-paid-fallback.md)
+- [0003：本地密钥使用文件指针](0003-local-secret-file-pointers.md)

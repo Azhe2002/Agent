@@ -13,6 +13,9 @@
 !**/.env.example
 !**/.env.*.example
 
+# Root connectivity-test template stays local; project templates may be tracked.
+/.env.example
+
 *.key
 *.pem
 *.p12
