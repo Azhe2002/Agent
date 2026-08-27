@@ -2,13 +2,13 @@
 
 这是一个以“推荐中午吃什么，并给出做法”为统一任务的三分支对照学习项目。它强调先理解 Agent 的组成和验证方法，再学习框架。
 
-> 当前状态：只有设计文档和目录骨架，没有业务代码、依赖清单或真实数据集。
+> 当前状态：分支 1 已具备可运行初版、25 道原创教学菜谱、共享评测用例和离线测试；真实 NVIDIA 基线完成后再进入分支 2。
 
 ## 三个学习分支
 
 | 分支 | 学习重点 | 当前状态 |
 |---|---|---|
-| [branch-1-python-handwritten](branch-1-python-handwritten/README.md) | 手写 Agent Loop、工具调用协议、错误处理 | 待实现 |
+| [branch-1-python-handwritten](branch-1-python-handwritten/README.md) | 手写 Agent Loop、工具调用协议、错误处理 | 初版已实现 |
 | [branch-2-python-langgraph](branch-2-python-langgraph/README.md) | 状态图、节点、条件边、持久化 | 待实现 |
 | [branch-3-typescript](branch-3-typescript/README.md) | TypeScript SDK、类型约束、与分支 1 对照 | 待实现 |
 
@@ -35,7 +35,7 @@
 | 目录 | 内容 |
 |---|---|
 | `docs/` | 需求、架构、安全、路由、评测、路线图和 ADR |
-| `datasets/` | 未来的菜谱与食材数据，格式规则见目录说明 |
+| `datasets/` | 25 道原创教学菜谱、模拟库存与数据来源说明 |
 | `evals/` | 跨分支共享评测用例和结果说明 |
 | `shared/` | 共享契约、Prompt 版本和设计约束 |
 | 三个 `branch-*` | 各实现分支的独立运行单元 |

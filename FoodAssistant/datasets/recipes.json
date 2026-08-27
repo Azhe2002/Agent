@@ -1,0 +1,415 @@
+{
+  "version": "recipes-v1.0.0",
+  "license": "MIT",
+  "recipes": [
+    {
+      "id": "tomato_scrambled_egg",
+      "name": "番茄炒蛋",
+      "description": "酸甜快手的家常菜，汤汁适合拌饭。",
+      "ingredients": [
+        {"name": "番茄", "amount": 2, "unit": "个"},
+        {"name": "鸡蛋", "amount": 3, "unit": "个"},
+        {"name": "葱", "amount": 1, "unit": "根"}
+      ],
+      "steps": ["番茄切块，鸡蛋加少许盐打散。", "鸡蛋炒至刚凝固后盛出。", "番茄炒出汁，倒回鸡蛋和葱花翻匀。"],
+      "cook_time_minutes": 15,
+      "flavor": "酸甜",
+      "suitable_weather": ["炎热", "舒适", "多云"],
+      "difficulty": "初级",
+      "allergen_notes": ["鸡蛋"]
+    },
+    {
+      "id": "potato_beef_stew",
+      "name": "土豆炖牛肉",
+      "description": "浓香耐炖、暖胃饱腹，适合降温或雨天。",
+      "ingredients": [
+        {"name": "牛肉", "amount": 400, "unit": "克"},
+        {"name": "土豆", "amount": 2, "unit": "个"},
+        {"name": "胡萝卜", "amount": 1, "unit": "根"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["牛肉冷水下锅焯去浮沫。", "牛肉与姜片加热水小火炖至七成熟。", "加入土豆和胡萝卜炖软，调味收汁。"],
+      "cook_time_minutes": 75,
+      "flavor": "咸鲜浓香",
+      "suitable_weather": ["寒冷", "雨天", "微凉"],
+      "difficulty": "中级",
+      "allergen_notes": []
+    },
+    {
+      "id": "carrot_potato_chicken_stew",
+      "name": "胡萝卜土豆炖鸡",
+      "description": "食材常见、汤汁温暖，适合用现有根茎菜完成一锅餐。",
+      "ingredients": [
+        {"name": "鸡腿肉", "amount": 350, "unit": "克"},
+        {"name": "土豆", "amount": 2, "unit": "个"},
+        {"name": "胡萝卜", "amount": 1, "unit": "根"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["鸡腿肉切块并焯水，土豆和胡萝卜切块。", "鸡肉与姜片加热水炖二十分钟。", "加入根茎菜炖软，调味后再煮五分钟。"],
+      "cook_time_minutes": 45,
+      "flavor": "咸鲜",
+      "suitable_weather": ["寒冷", "雨天", "阴天"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "hot_sour_potato",
+      "name": "酸辣土豆丝",
+      "description": "脆爽开胃的十分钟下饭菜。",
+      "ingredients": [
+        {"name": "土豆", "amount": 2, "unit": "个"},
+        {"name": "干辣椒", "amount": 2, "unit": "个"},
+        {"name": "米醋", "amount": 1, "unit": "汤匙"}
+      ],
+      "steps": ["土豆切细丝后用清水洗去表面淀粉。", "热锅爆香辣椒，放入土豆丝大火翻炒。", "沿锅边加醋和盐，炒至断生立刻出锅。"],
+      "cook_time_minutes": 12,
+      "flavor": "酸辣",
+      "suitable_weather": ["炎热", "舒适"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "mapo_tofu",
+      "name": "麻婆豆腐",
+      "description": "麻辣下饭，豆腐软嫩，适合想吃重口味时。",
+      "ingredients": [
+        {"name": "豆腐", "amount": 400, "unit": "克"},
+        {"name": "猪肉末", "amount": 100, "unit": "克"},
+        {"name": "豆瓣酱", "amount": 1, "unit": "汤匙"},
+        {"name": "花椒粉", "amount": 1, "unit": "茶匙"}
+      ],
+      "steps": ["豆腐切块后用淡盐水焯一分钟。", "炒香肉末和豆瓣酱，加少量热水。", "放入豆腐轻推入味，勾薄芡并撒花椒粉。"],
+      "cook_time_minutes": 25,
+      "flavor": "麻辣",
+      "suitable_weather": ["寒冷", "雨天"],
+      "difficulty": "中级",
+      "allergen_notes": ["大豆"]
+    },
+    {
+      "id": "mushroom_tofu_soup",
+      "name": "菌菇豆腐汤",
+      "description": "清淡鲜美、十几分钟完成的暖汤。",
+      "ingredients": [
+        {"name": "豆腐", "amount": 250, "unit": "克"},
+        {"name": "香菇", "amount": 5, "unit": "朵"},
+        {"name": "白玉菇", "amount": 100, "unit": "克"},
+        {"name": "葱", "amount": 1, "unit": "根"}
+      ],
+      "steps": ["菌菇洗净切好，豆腐切小块。", "菌菇加水煮五分钟后放入豆腐。", "继续煮五分钟，用盐调味并撒葱花。"],
+      "cook_time_minutes": 18,
+      "flavor": "清淡鲜美",
+      "suitable_weather": ["寒冷", "雨天", "微凉"],
+      "difficulty": "初级",
+      "allergen_notes": ["大豆"]
+    },
+    {
+      "id": "winter_melon_meatball_soup",
+      "name": "冬瓜丸子汤",
+      "description": "汤清味鲜，兼顾蔬菜和蛋白质。",
+      "ingredients": [
+        {"name": "冬瓜", "amount": 400, "unit": "克"},
+        {"name": "猪肉末", "amount": 250, "unit": "克"},
+        {"name": "姜", "amount": 2, "unit": "片"},
+        {"name": "葱", "amount": 1, "unit": "根"}
+      ],
+      "steps": ["肉末加盐和葱姜水搅至上劲。", "冬瓜片煮至半透明，将肉末挤成丸子下锅。", "小火煮至丸子熟透，撇沫后调味。"],
+      "cook_time_minutes": 30,
+      "flavor": "清淡",
+      "suitable_weather": ["炎热", "舒适", "多云"],
+      "difficulty": "中级",
+      "allergen_notes": []
+    },
+    {
+      "id": "cucumber_salad",
+      "name": "凉拌黄瓜",
+      "description": "清爽脆嫩、无需明火的快手凉菜。",
+      "ingredients": [
+        {"name": "黄瓜", "amount": 2, "unit": "根"},
+        {"name": "蒜", "amount": 2, "unit": "瓣"},
+        {"name": "米醋", "amount": 1, "unit": "汤匙"},
+        {"name": "香油", "amount": 1, "unit": "茶匙"}
+      ],
+      "steps": ["黄瓜清洗后拍裂切段。", "蒜切末，与醋、盐和香油调成料汁。", "黄瓜拌匀后静置五分钟。"],
+      "cook_time_minutes": 10,
+      "flavor": "清爽酸香",
+      "suitable_weather": ["炎热", "闷热"],
+      "difficulty": "初级",
+      "allergen_notes": ["芝麻"]
+    },
+    {
+      "id": "pepper_pork",
+      "name": "青椒肉丝",
+      "description": "咸鲜微辣、搭配米饭的经典家常菜。",
+      "ingredients": [
+        {"name": "猪里脊", "amount": 250, "unit": "克"},
+        {"name": "青椒", "amount": 3, "unit": "个"},
+        {"name": "姜", "amount": 2, "unit": "片"}
+      ],
+      "steps": ["肉切丝后加少量淀粉和盐抓匀。", "肉丝滑炒变色后盛出。", "青椒丝炒至断生，倒回肉丝调味。"],
+      "cook_time_minutes": 20,
+      "flavor": "咸鲜微辣",
+      "suitable_weather": ["舒适", "多云"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "kung_pao_chicken",
+      "name": "宫保鸡丁",
+      "description": "酸甜微辣并带坚果香，口感丰富。",
+      "ingredients": [
+        {"name": "鸡胸肉", "amount": 300, "unit": "克"},
+        {"name": "花生", "amount": 50, "unit": "克"},
+        {"name": "黄瓜", "amount": 1, "unit": "根"},
+        {"name": "干辣椒", "amount": 3, "unit": "个"}
+      ],
+      "steps": ["鸡肉切丁腌十分钟，黄瓜切丁。", "鸡丁滑炒变色，加入辣椒和黄瓜。", "倒入酸甜料汁快速收浓，最后放花生。"],
+      "cook_time_minutes": 30,
+      "flavor": "酸甜微辣",
+      "suitable_weather": ["舒适", "微凉"],
+      "difficulty": "中级",
+      "allergen_notes": ["花生"]
+    },
+    {
+      "id": "braised_eggplant",
+      "name": "家常烧茄子",
+      "description": "软糯入味的下饭素菜。",
+      "ingredients": [
+        {"name": "茄子", "amount": 2, "unit": "根"},
+        {"name": "番茄", "amount": 1, "unit": "个"},
+        {"name": "蒜", "amount": 3, "unit": "瓣"}
+      ],
+      "steps": ["茄子切块后撒少许盐静置并挤水。", "少油煎软茄子，加入番茄炒出汁。", "放蒜末和调味汁烧至入味。"],
+      "cook_time_minutes": 25,
+      "flavor": "咸鲜微甜",
+      "suitable_weather": ["舒适", "多云"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "steamed_egg",
+      "name": "家常蒸蛋",
+      "description": "软嫩清淡，适合时间有限或胃口较轻时。",
+      "ingredients": [
+        {"name": "鸡蛋", "amount": 2, "unit": "个"},
+        {"name": "温水", "amount": 180, "unit": "毫升"},
+        {"name": "葱", "amount": 1, "unit": "根"}
+      ],
+      "steps": ["鸡蛋打散，加入约一点五倍温水和少许盐。", "过滤蛋液并盖上耐热盖。", "水开后中小火蒸十分钟，关火焖两分钟。"],
+      "cook_time_minutes": 15,
+      "flavor": "清淡",
+      "suitable_weather": ["全年", "舒适"],
+      "difficulty": "初级",
+      "allergen_notes": ["鸡蛋"]
+    },
+    {
+      "id": "vegetable_fried_rice",
+      "name": "时蔬蛋炒饭",
+      "description": "利用剩饭和库存蔬菜快速完成一餐。",
+      "ingredients": [
+        {"name": "米饭", "amount": 2, "unit": "碗"},
+        {"name": "鸡蛋", "amount": 2, "unit": "个"},
+        {"name": "胡萝卜", "amount": 0.5, "unit": "根"},
+        {"name": "青豆", "amount": 50, "unit": "克"}
+      ],
+      "steps": ["鸡蛋炒散盛出，胡萝卜切小丁。", "蔬菜炒熟后加入米饭压散。", "倒回鸡蛋，大火翻炒并用盐调味。"],
+      "cook_time_minutes": 15,
+      "flavor": "咸香",
+      "suitable_weather": ["全年", "忙碌"],
+      "difficulty": "初级",
+      "allergen_notes": ["鸡蛋"]
+    },
+    {
+      "id": "tomato_egg_noodles",
+      "name": "番茄鸡蛋面",
+      "description": "有汤有主食，酸香暖胃的二十分钟午餐。",
+      "ingredients": [
+        {"name": "面条", "amount": 200, "unit": "克"},
+        {"name": "番茄", "amount": 2, "unit": "个"},
+        {"name": "鸡蛋", "amount": 2, "unit": "个"},
+        {"name": "青菜", "amount": 100, "unit": "克"}
+      ],
+      "steps": ["番茄炒出汁后加水煮开。", "下面条煮至接近熟透。", "淋入蛋液，放青菜煮熟并调味。"],
+      "cook_time_minutes": 20,
+      "flavor": "酸香清爽",
+      "suitable_weather": ["寒冷", "雨天", "忙碌"],
+      "difficulty": "初级",
+      "allergen_notes": ["鸡蛋", "麸质"]
+    },
+    {
+      "id": "pumpkin_congee",
+      "name": "南瓜小米粥",
+      "description": "温和软糯，适合作为清淡暖胃主食。",
+      "ingredients": [
+        {"name": "小米", "amount": 100, "unit": "克"},
+        {"name": "南瓜", "amount": 250, "unit": "克"},
+        {"name": "水", "amount": 1000, "unit": "毫升"}
+      ],
+      "steps": ["小米淘洗，南瓜去皮切小块。", "水开后放小米和南瓜，转小火。", "煮至米粒开花、南瓜软烂并适时搅拌。"],
+      "cook_time_minutes": 35,
+      "flavor": "清甜",
+      "suitable_weather": ["寒冷", "早餐", "微凉"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "mushroom_chicken",
+      "name": "香菇滑鸡",
+      "description": "鸡肉嫩滑、菌菇鲜香，可蒸可焖。",
+      "ingredients": [
+        {"name": "鸡腿肉", "amount": 350, "unit": "克"},
+        {"name": "香菇", "amount": 6, "unit": "朵"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["鸡肉切块，加盐和少量淀粉腌十分钟。", "香菇切片，与鸡肉和姜片拌匀。", "水开后上锅蒸二十分钟，确认鸡肉熟透。"],
+      "cook_time_minutes": 35,
+      "flavor": "咸鲜",
+      "suitable_weather": ["全年", "微凉"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "cabbage_vermicelli",
+      "name": "白菜粉丝煲",
+      "description": "白菜清甜、粉丝吸汁，适合阴冷天气。",
+      "ingredients": [
+        {"name": "大白菜", "amount": 400, "unit": "克"},
+        {"name": "粉丝", "amount": 80, "unit": "克"},
+        {"name": "香菇", "amount": 4, "unit": "朵"},
+        {"name": "蒜", "amount": 2, "unit": "瓣"}
+      ],
+      "steps": ["粉丝泡软，白菜切段，香菇切片。", "蒜和香菇炒香后放白菜略炒。", "加水和粉丝焖至入味，避免粉丝粘锅。"],
+      "cook_time_minutes": 25,
+      "flavor": "清鲜",
+      "suitable_weather": ["寒冷", "雨天", "阴天"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "garlic_broccoli",
+      "name": "蒜蓉西兰花",
+      "description": "翠绿爽脆、清淡快速的蔬菜菜。",
+      "ingredients": [
+        {"name": "西兰花", "amount": 1, "unit": "颗"},
+        {"name": "蒜", "amount": 4, "unit": "瓣"}
+      ],
+      "steps": ["西兰花切小朵后用淡盐水浸洗。", "沸水加少许盐，将西兰花焯至断生。", "蒜末炒香，放西兰花快速翻匀调味。"],
+      "cook_time_minutes": 12,
+      "flavor": "蒜香清淡",
+      "suitable_weather": ["炎热", "舒适"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "steamed_fish",
+      "name": "葱姜清蒸鱼",
+      "description": "突出鱼肉本味的清淡蒸菜。",
+      "ingredients": [
+        {"name": "鲈鱼", "amount": 1, "unit": "条"},
+        {"name": "姜", "amount": 5, "unit": "片"},
+        {"name": "葱", "amount": 2, "unit": "根"}
+      ],
+      "steps": ["鱼处理干净，在鱼身放葱姜。", "水开后上锅蒸约八至十分钟。", "确认鱼肉熟透，倒去腥水后加新葱丝和蒸鱼汁。"],
+      "cook_time_minutes": 25,
+      "flavor": "清鲜",
+      "suitable_weather": ["全年", "炎热"],
+      "difficulty": "中级",
+      "allergen_notes": ["鱼类"]
+    },
+    {
+      "id": "corn_rib_soup",
+      "name": "玉米排骨汤",
+      "description": "清甜温暖、适合全家分享的汤菜。",
+      "ingredients": [
+        {"name": "排骨", "amount": 500, "unit": "克"},
+        {"name": "玉米", "amount": 1, "unit": "根"},
+        {"name": "胡萝卜", "amount": 1, "unit": "根"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["排骨冷水焯净，玉米和胡萝卜切块。", "排骨与姜片加足量热水炖四十分钟。", "加入玉米胡萝卜继续炖二十分钟后调味。"],
+      "cook_time_minutes": 70,
+      "flavor": "清甜鲜美",
+      "suitable_weather": ["寒冷", "雨天", "微凉"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "lotus_root_rib_soup",
+      "name": "莲藕排骨汤",
+      "description": "莲藕粉糯、汤味醇和的秋冬汤品。",
+      "ingredients": [
+        {"name": "排骨", "amount": 500, "unit": "克"},
+        {"name": "莲藕", "amount": 500, "unit": "克"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["排骨焯水，莲藕去皮切滚刀块。", "排骨与姜片加热水炖四十分钟。", "加莲藕再炖三十分钟，最后放盐。"],
+      "cook_time_minutes": 80,
+      "flavor": "醇厚清鲜",
+      "suitable_weather": ["寒冷", "秋季", "雨天"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "garlic_lettuce",
+      "name": "蒜蓉生菜",
+      "description": "五分钟大火快炒，口感清脆。",
+      "ingredients": [
+        {"name": "生菜", "amount": 400, "unit": "克"},
+        {"name": "蒜", "amount": 4, "unit": "瓣"}
+      ],
+      "steps": ["生菜洗净沥干，蒜切末。", "热锅少油炒香一半蒜末。", "生菜大火炒软，加入剩余蒜末和盐立刻出锅。"],
+      "cook_time_minutes": 8,
+      "flavor": "蒜香清爽",
+      "suitable_weather": ["炎热", "忙碌", "舒适"],
+      "difficulty": "初级",
+      "allergen_notes": []
+    },
+    {
+      "id": "chive_scrambled_egg",
+      "name": "韭菜炒蛋",
+      "description": "香气足、十分钟完成的家常快手菜。",
+      "ingredients": [
+        {"name": "韭菜", "amount": 250, "unit": "克"},
+        {"name": "鸡蛋", "amount": 3, "unit": "个"}
+      ],
+      "steps": ["韭菜洗净切段，鸡蛋加盐打散。", "鸡蛋炒至半凝固时加入韭菜。", "快速翻炒至韭菜断生后出锅。"],
+      "cook_time_minutes": 10,
+      "flavor": "鲜香",
+      "suitable_weather": ["春季", "忙碌", "舒适"],
+      "difficulty": "初级",
+      "allergen_notes": ["鸡蛋"]
+    },
+    {
+      "id": "sweet_sour_ribs",
+      "name": "糖醋排骨",
+      "description": "酸甜浓郁、适合周末改善口味的硬菜。",
+      "ingredients": [
+        {"name": "排骨", "amount": 500, "unit": "克"},
+        {"name": "冰糖", "amount": 25, "unit": "克"},
+        {"name": "米醋", "amount": 2, "unit": "汤匙"},
+        {"name": "姜", "amount": 3, "unit": "片"}
+      ],
+      "steps": ["排骨焯水并擦干表面。", "少油煎排骨，加入糖醋汁和热水焖煮。", "排骨熟透后大火收汁，注意糖汁避免焦糊。"],
+      "cook_time_minutes": 55,
+      "flavor": "酸甜",
+      "suitable_weather": ["周末", "舒适"],
+      "difficulty": "中级",
+      "allergen_notes": []
+    },
+    {
+      "id": "spinach_tofu_soup",
+      "name": "菠菜豆腐汤",
+      "description": "颜色清新、口味清淡的十几分钟汤菜。",
+      "ingredients": [
+        {"name": "菠菜", "amount": 250, "unit": "克"},
+        {"name": "豆腐", "amount": 250, "unit": "克"},
+        {"name": "姜", "amount": 2, "unit": "片"}
+      ],
+      "steps": ["菠菜洗净焯水后切段，豆腐切块。", "清水加姜片煮开后放豆腐煮五分钟。", "加入菠菜再煮一分钟，用盐调味。"],
+      "cook_time_minutes": 15,
+      "flavor": "清淡",
+      "suitable_weather": ["全年", "炎热", "微凉"],
+      "difficulty": "初级",
+      "allergen_notes": ["大豆"]
+    }
+  ]
+}

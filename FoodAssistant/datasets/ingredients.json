@@ -1,0 +1,21 @@
+{
+  "version": "ingredients-v1.0.0",
+  "ingredients": [
+    {"id": "potato", "name": "土豆", "quantity": 3, "unit": "个", "freshness": "充足"},
+    {"id": "carrot", "name": "胡萝卜", "quantity": 2, "unit": "根", "freshness": "充足"},
+    {"id": "tomato", "name": "番茄", "quantity": 3, "unit": "个", "freshness": "优先使用"},
+    {"id": "egg", "name": "鸡蛋", "quantity": 6, "unit": "个", "freshness": "充足"},
+    {"id": "chicken_thigh", "name": "鸡腿肉", "quantity": 400, "unit": "克", "freshness": "今日使用"},
+    {"id": "pork", "name": "猪里脊", "quantity": 250, "unit": "克", "freshness": "冷藏"},
+    {"id": "tofu", "name": "豆腐", "quantity": 400, "unit": "克", "freshness": "优先使用"},
+    {"id": "shiitake", "name": "香菇", "quantity": 8, "unit": "朵", "freshness": "充足"},
+    {"id": "cucumber", "name": "黄瓜", "quantity": 2, "unit": "根", "freshness": "充足"},
+    {"id": "cabbage", "name": "大白菜", "quantity": 500, "unit": "克", "freshness": "充足"},
+    {"id": "spinach", "name": "菠菜", "quantity": 250, "unit": "克", "freshness": "今日使用"},
+    {"id": "rice", "name": "米饭", "quantity": 2, "unit": "碗", "freshness": "冷藏剩饭"},
+    {"id": "noodles", "name": "面条", "quantity": 300, "unit": "克", "freshness": "常温"},
+    {"id": "garlic", "name": "蒜", "quantity": 1, "unit": "头", "freshness": "充足"},
+    {"id": "ginger", "name": "姜", "quantity": 1, "unit": "块", "freshness": "充足"},
+    {"id": "scallion", "name": "葱", "quantity": 3, "unit": "根", "freshness": "充足"}
+  ]
+}
