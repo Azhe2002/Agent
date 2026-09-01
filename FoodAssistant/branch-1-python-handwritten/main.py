@@ -9,7 +9,7 @@ from pathlib import Path
 
 from agent import AgentError, HandwrittenAgent
 from config import ConfigurationError, DEFAULT_CONFIG_PATH, load_settings
-from model_client import NvidiaChatClient
+from model_client import OpenAICompatibleChatClient
 from tools import DatasetError, RecipeRepository, ToolRegistry
 
 
@@ -22,7 +22,7 @@ def _configure_console() -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Python 手写 Agent Loop 美食助手（NVIDIA API）"
+        description="Python 手写 Agent Loop 美食助手（OpenAI 兼容 API）"
     )
     parser.add_argument(
         "query",
@@ -57,7 +57,7 @@ def main() -> int:
         settings = load_settings(args.config)
         repository = RecipeRepository()
         tools = ToolRegistry(repository)
-        client = NvidiaChatClient(settings)
+        client = OpenAICompatibleChatClient(settings)
         agent = HandwrittenAgent(
             client,
             tools,

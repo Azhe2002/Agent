@@ -9,7 +9,13 @@ from pathlib import Path
 BRANCH_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BRANCH_DIR))
 
-from config import ConfigurationError, EnvValue, Settings, _base_url, parse_env_file
+from config import (
+    ConfigurationError,
+    EnvValue,
+    Settings,
+    _base_url,
+    parse_env_file,
+)
 
 
 class ConfigTests(unittest.TestCase):
@@ -32,7 +38,7 @@ class ConfigTests(unittest.TestCase):
             )
         }
         with self.assertRaises(ConfigurationError):
-            _base_url(values)
+            _base_url("nvidia", values)
 
     def test_settings_repr_does_not_reveal_api_key(self) -> None:
         settings = Settings(
@@ -48,6 +54,17 @@ class ConfigTests(unittest.TestCase):
             verbose=False,
         )
         self.assertNotIn("SECRET_SENTINEL", repr(settings))
+
+    def test_official_provider_base_urls_are_allowed(self) -> None:
+        cases = {
+            "deepseek": ("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+            "mimo": ("MIMO_BASE_URL", "https://api.xiaomimimo.com/v1"),
+            "kimi": ("KIMI_BASE_URL", "https://api.moonshot.cn/v1"),
+        }
+        for provider, (name, url) in cases.items():
+            with self.subTest(provider=provider):
+                values = {name: EnvValue(url, Path.cwd())}
+                self.assertEqual(_base_url(provider, values), url)
 
 
 if __name__ == "__main__":

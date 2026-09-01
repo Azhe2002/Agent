@@ -36,9 +36,10 @@
 branch-1-python-handwritten/
 ├── main.py           # 入口：命令行解析、组装所有零件、打印结果（起点）
 ├── config.py         # 读配置：.env 文件 + 系统环境变量 + API 密钥文件指针
-├── model_client.py   # 发 HTTP 请求给 NVIDIA 大模型 API，解析响应
+├── model_client.py   # 发 OpenAI 兼容 HTTP 请求，解析各供应商响应
 ├── tools.py          # 数据加载 + 四个工具 + 工具注册表 + 结果缓存
 ├── agent.py          # 手写 Agent Loop（核心循环）
+├── web/              # 本地 Web 快速测试页与供应商选择入口
 ├── KNOWLEDGE.md      # 本文档
 ├── requirements.txt  # 空依赖声明（只用标准库）
 └── tests/            # 不联网的单元测试（unittest）
@@ -53,7 +54,7 @@ branch-1-python-handwritten/
 ```
 main.py
   ├── config.py        （Settings、load_settings）
-  ├── model_client.py  （NvidiaChatClient）
+  ├── model_client.py  （OpenAICompatibleChatClient）
   ├── tools.py         （RecipeRepository、ToolRegistry）
   └── agent.py         （HandwrittenAgent、AgentError）
         ├── model_client.py  （ChatResponse、ModelClientError）
@@ -76,7 +77,7 @@ main.py
 1. **配置** `config.load_settings()` 读取 `FoodAssistant/.env`，得到模型名、超时、密钥等，装进一个不可变的 `Settings` 对象。
 2. **数据** `RecipeRepository()` 把两份 JSON 加载进内存，并做严格校验（字段齐全、id 唯一、非空列表等）。
 3. **工具** `ToolRegistry(repository)` 注册四个工具，并生成供模型"看"的 JSON Schema 声明。
-4. **客户端** `NvidiaChatClient(settings)` 准备好发 HTTP 请求。
+4. **客户端** `OpenAICompatibleChatClient(settings)` 准备好发 HTTP 请求。
 5. **Agent** `HandwrittenAgent(client, tools, ...)` 启动循环（第 1 节的图）。
 6. **打印** 循环结束后，`main.py` 打印最终回答 + 一行脱敏运行摘要（几步、几次模型调用、几次工具调用、缓存命中几次、耗时、Token 用量）。
 7. **退出码**：完成返回 `0`，模型失败返回 `1`，配置/数据错误返回 `2`，到步数上限未完成返回 `3`。
@@ -95,7 +96,7 @@ PROJECT_ROOT = BRANCH_DIR.parent               # FoodAssistant/
 REPO_ROOT = PROJECT_ROOT.parent                # 仓库根 f:/Agent
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / ".env"    # FoodAssistant/.env
 APIKEY_ROOT = (REPO_ROOT / "APIKEY").resolve() # f:/Agent/APIKEY
-ALLOWED_NVIDIA_KEY_FILE = APIKEY_ROOT / "nvidia-api-key.md"
+PROVIDER_KEY_FILES = {供应商: APIKEY_ROOT / 对应白名单文件名}
 ```
 
 注意 `APIKEY/` 是被仓库规则明令禁止读取/打印/上传的敏感目录。本代码只**记录它的路径**，用来做白名单比对，绝不读它的内容到日志或错误里。
@@ -127,12 +128,12 @@ ALLOWED_NVIDIA_KEY_FILE = APIKEY_ROOT / "nvidia-api-key.md"
 
 支持两种方式，**二选一**：
 
-1. 直接在 `NVIDIA_API_KEY` 里放密钥（不推荐）
-2. 推荐：`NVIDIA_API_KEY_FILE` 指向一个文件，里面只有一行密钥
+1. 直接在 `<供应商>_API_KEY` 里放密钥（不推荐）
+2. 推荐：`<供应商>_API_KEY_FILE` 指向对应文件，里面只有一行密钥
 
 第二种方式的校验很严格：
 
-- 指针解析后的真实路径必须**恰好等于** `APIKEY/nvidia-api-key.md`（白名单，防止模型/代码去读别的文件）
+- 指针解析后的真实路径必须**恰好等于**该供应商的 `APIKEY/<provider>-api-key.md`（白名单，防止模型/代码去读别的文件）
 - 文件必须**恰好一行**非空内容
 - 密钥长度 ≥ 20 且不含空白字符
 
@@ -140,12 +141,14 @@ ALLOWED_NVIDIA_KEY_FILE = APIKEY_ROOT / "nvidia-api-key.md"
 
 ### 4.6 `_base_url` 与 `load_settings`
 
-`_base_url` 只允许 `https://integrate.api.nvidia.com/v1` 这一种写法，其它一律报错——防止被恶意配置指到假服务器。
+`_base_url` 按供应商只允许 NVIDIA、DeepSeek、MiMo、Kimi 的官方 HTTPS 端点，其它一律报错——防止被恶意配置指到假服务器。
 
 `load_settings` 汇总所有校验，还锁死了两条业务边界：
 
-- `MODEL_PROVIDER` 只允许 `nvidia`
+- `MODEL_PROVIDER` 只允许 `nvidia`、`deepseek`、`mimo`、`kimi`
 - `PAID_FALLBACK_ENABLED` 必须是 `false`（付费回退未实现，直接拒绝）
+
+命令行读取 `MODEL_PROVIDER`；Web 测试页则把用户本次明确选择的供应商作为受限覆盖值。两种入口都只执行所选供应商，不会自动回退。
 
 ### 4.7 设计意图总结
 
@@ -155,7 +158,7 @@ ALLOWED_NVIDIA_KEY_FILE = APIKEY_ROOT / "nvidia-api-key.md"
 
 ## 5. `model_client.py` —— 手写 HTTP 客户端
 
-只依赖标准库的 `urllib.request`，向 NVIDIA 的 OpenAI 兼容接口发请求。
+只依赖标准库的 `urllib.request`，向所选供应商的 OpenAI 兼容接口发请求。
 
 ### 5.1 数据结构
 
@@ -179,10 +182,10 @@ ALLOWED_NVIDIA_KEY_FILE = APIKEY_ROOT / "nvidia-api-key.md"
 
 流程：
 
-1. **组装 payload**：模型名、消息列表、温度、最大输出 token、推理强度，`stream=False`（不流式）。如果有工具 schema，再加上 `tools` 和 `tool_choice="auto"`。
+1. **组装 payload**：模型名、消息列表、最大输出 token 和 `stream=False`（不流式）。如果有工具 schema，再加上 `tools` 和 `tool_choice="auto"`。适配层只处理必要差异：MiMo 使用 `max_completion_tokens`；DeepSeek、MiMo、Kimi 关闭思考模式以保持工具轮次紧凑；Kimi 使用模型推荐温度，因此不发送通用温度值。
 2. **发 POST 请求**：到 `{base_url}/chat/completions`，带 `Authorization: Bearer <key>` 头，超时时间来自 `Settings.timeout_seconds`，响应体最大读 2MB。
 3. **处理网络异常**：`HTTPError` → 按状态码分类；超时/`URLError` → `timeout`。
-4. **处理奇怪状态码**：202 说明 NVIDIA 返回了异步响应（本 MVP 不支持轮询，直接报 `provider_pending`）；非 200 报 `http_error`。
+4. **处理奇怪状态码**：202 说明供应商返回了异步响应（本 MVP 不支持轮询，直接报 `provider_pending`）；非 200 按状态码分类。
 5. **解析 JSON**：取 `choices[0].message`，转成结构干净的 `message` dict（保留 `content`、`tool_calls`、`reasoning_content`）。解析失败（乱码、缺字段、类型不对）统一报 `invalid_response`，**不会把原始响应原样塞给上层**。
 6. **记录用量**：只保留 `int` 类型的 usage 字段。
 

@@ -14,9 +14,36 @@ PROJECT_ROOT = BRANCH_DIR.parent
 REPO_ROOT = PROJECT_ROOT.parent
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / ".env"
 APIKEY_ROOT = (REPO_ROOT / "APIKEY").resolve()
-ALLOWED_NVIDIA_KEY_FILE = (APIKEY_ROOT / "nvidia-api-key.md").resolve()
-DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
-DEFAULT_MODEL = "openai/gpt-oss-20b"
+PROVIDER_PREFIXES = {
+    "nvidia": "NVIDIA",
+    "deepseek": "DEEPSEEK",
+    "mimo": "MIMO",
+    "kimi": "KIMI",
+}
+PROVIDER_KEY_FILES = {
+    provider: (APIKEY_ROOT / f"{provider}-api-key.md").resolve()
+    for provider in PROVIDER_PREFIXES
+}
+PROVIDER_DEFAULT_MODELS = {
+    "nvidia": "openai/gpt-oss-20b",
+    "deepseek": "deepseek-v4-flash",
+    "mimo": "mimo-v2.5",
+    "kimi": "kimi-k2.6",
+}
+PROVIDER_DEFAULT_BASE_URLS = {
+    "nvidia": "https://integrate.api.nvidia.com/v1",
+    "deepseek": "https://api.deepseek.com",
+    "mimo": "https://api.xiaomimimo.com/v1",
+    "kimi": "https://api.moonshot.cn/v1",
+}
+PROVIDER_ALLOWED_BASE_URLS = {
+    "nvidia": {"https://integrate.api.nvidia.com/v1"},
+    "deepseek": {"https://api.deepseek.com", "https://api.deepseek.com/v1"},
+    "mimo": {"https://api.xiaomimimo.com/v1"},
+    "kimi": {"https://api.moonshot.cn/v1", "https://api.moonshot.ai/v1"},
+}
+DEFAULT_BASE_URL = PROVIDER_DEFAULT_BASE_URLS["nvidia"]
+DEFAULT_MODEL = PROVIDER_DEFAULT_MODELS["nvidia"]
 
 
 class ConfigurationError(ValueError):
@@ -136,17 +163,18 @@ def _number(
     return result
 
 
-def _api_key(file_values: dict[str, EnvValue]) -> str:
-    direct = _value("NVIDIA_API_KEY", file_values)
-    pointer = _value("NVIDIA_API_KEY_FILE", file_values)
+def _api_key(provider: str, file_values: dict[str, EnvValue]) -> str:
+    prefix = PROVIDER_PREFIXES[provider]
+    direct = _value(f"{prefix}_API_KEY", file_values)
+    pointer = _value(f"{prefix}_API_KEY_FILE", file_values)
     if direct.value and pointer.value:
         raise ConfigurationError(
-            "Set NVIDIA_API_KEY or NVIDIA_API_KEY_FILE, not both"
+            f"Set {prefix}_API_KEY or {prefix}_API_KEY_FILE, not both"
         )
     if direct.value:
         return direct.value
     if not pointer.value:
-        raise ConfigurationError("NVIDIA credential source is not configured")
+        raise ConfigurationError(f"{prefix} credential source is not configured")
 
     candidate = Path(pointer.value)
     if not candidate.is_absolute():
@@ -154,10 +182,10 @@ def _api_key(file_values: dict[str, EnvValue]) -> str:
     try:
         resolved = candidate.resolve(strict=True)
     except OSError as exc:
-        raise ConfigurationError("NVIDIA key file does not exist") from exc
-    if resolved != ALLOWED_NVIDIA_KEY_FILE:
+        raise ConfigurationError(f"{prefix} key file does not exist") from exc
+    if resolved != PROVIDER_KEY_FILES[provider]:
         raise ConfigurationError(
-            "NVIDIA key file must be APIKEY/nvidia-api-key.md"
+            f"{prefix} key file must be APIKEY/{provider}-api-key.md"
         )
 
     try:
@@ -167,51 +195,66 @@ def _api_key(file_values: dict[str, EnvValue]) -> str:
             if line.strip()
         ]
     except OSError as exc:
-        raise ConfigurationError("NVIDIA key file could not be read") from exc
+        raise ConfigurationError(f"{prefix} key file could not be read") from exc
     if len(lines) != 1:
         raise ConfigurationError(
-            "NVIDIA key file must contain exactly one non-empty line"
+            f"{prefix} key file must contain exactly one non-empty line"
         )
     key = lines[0]
     if len(key) < 20 or any(character.isspace() for character in key):
-        raise ConfigurationError("NVIDIA key file has an invalid format")
+        raise ConfigurationError(f"{prefix} key file has an invalid format")
     return key
 
 
-def _base_url(file_values: dict[str, EnvValue]) -> str:
+def _base_url(provider: str, file_values: dict[str, EnvValue]) -> str:
+    prefix = PROVIDER_PREFIXES[provider]
     value = _value(
-        "NVIDIA_BASE_URL", file_values, default=DEFAULT_BASE_URL
+        f"{prefix}_BASE_URL",
+        file_values,
+        default=PROVIDER_DEFAULT_BASE_URLS[provider],
     ).value.rstrip("/")
     parsed = urlparse(value)
     if (
         parsed.scheme != "https"
-        or parsed.hostname != "integrate.api.nvidia.com"
         or parsed.username is not None
         or parsed.password is not None
         or parsed.port not in (None, 443)
-        or parsed.path not in ("", "/v1")
         or parsed.query
         or parsed.fragment
+        or value not in PROVIDER_ALLOWED_BASE_URLS[provider]
     ):
         raise ConfigurationError(
-            "NVIDIA_BASE_URL must be https://integrate.api.nvidia.com/v1"
+            f"{prefix}_BASE_URL is not an allowed official endpoint"
         )
-    return DEFAULT_BASE_URL
+    return value
 
 
-def load_settings(config_path: Path | None = None) -> Settings:
+def load_settings(
+    config_path: Path | None = None,
+    *,
+    provider_override: str | None = None,
+    model_override: str | None = None,
+) -> Settings:
     path = (config_path or DEFAULT_CONFIG_PATH).resolve()
     file_values = parse_env_file(path)
 
-    provider = _value("MODEL_PROVIDER", file_values, default="nvidia").value.lower()
-    if provider != "nvidia":
-        raise ConfigurationError("Branch 1 currently supports only MODEL_PROVIDER=nvidia")
+    provider = (
+        provider_override
+        or _value("MODEL_PROVIDER", file_values, default="nvidia").value
+    ).lower()
+    if provider not in PROVIDER_PREFIXES:
+        raise ConfigurationError("MODEL_PROVIDER is not supported in Branch 1")
     if _boolean("PAID_FALLBACK_ENABLED", file_values, False):
         raise ConfigurationError("Paid-provider fallback is not implemented in Branch 1")
 
-    model = _value("NVIDIA_MODEL", file_values, default=DEFAULT_MODEL).value
+    prefix = PROVIDER_PREFIXES[provider]
+    model = model_override or _value(
+        f"{prefix}_MODEL",
+        file_values,
+        default=PROVIDER_DEFAULT_MODELS[provider],
+    ).value
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{1,127}", model):
-        raise ConfigurationError("NVIDIA_MODEL has an invalid format")
+        raise ConfigurationError(f"{prefix}_MODEL has an invalid format")
 
     reasoning_effort = _value(
         "AGENT_REASONING_EFFORT", file_values, default="low"
@@ -223,8 +266,8 @@ def load_settings(config_path: Path | None = None) -> Settings:
 
     return Settings(
         provider=provider,
-        api_key=_api_key(file_values),
-        base_url=_base_url(file_values),
+        api_key=_api_key(provider, file_values),
+        base_url=_base_url(provider, file_values),
         model=model,
         timeout_seconds=_number(
             "MODEL_TIMEOUT_SECONDS",

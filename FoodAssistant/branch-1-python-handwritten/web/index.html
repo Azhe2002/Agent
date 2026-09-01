@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="用于快速验证 branch1 手写 Agent Loop 的本地美食助手测试台"
+    />
+    <title>美食小助手 · Branch 1 测试台</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="美食小助手测试台首页">
+        <span class="brand-mark" aria-hidden="true">食</span>
+        <span>
+          <strong>美食小助手</strong>
+          <small>BRANCH 1 · QUICK TEST</small>
+        </span>
+      </a>
+      <div class="status-pill" title="当前使用本地只读工具与所选模型">
+        <span class="status-dot" aria-hidden="true"></span>
+        本地测试
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">HANDWRITTEN AGENT LOOP</p>
+        <h1 id="page-title">今天中午，吃点什么？</h1>
+        <p>
+          写下天气、已有食材、口味或时间限制，快速验证 Agent 的推荐、工具调用与耗时。
+        </p>
+      </section>
+
+      <section class="test-panel" aria-label="测试输入与结果">
+        <div class="composer-card">
+          <form id="chat-form">
+            <div class="field-heading">
+              <label for="message">午餐需求</label>
+              <span id="character-count">0 / 2000</span>
+            </div>
+            <textarea
+              id="message"
+              name="message"
+              maxlength="2000"
+              rows="6"
+              placeholder="例如：今天下雨有点冷，家里有土豆、胡萝卜和鸡腿肉，想吃暖和一点的。"
+              required
+            ></textarea>
+
+            <div class="examples" aria-label="测试示例">
+              <span>试试：</span>
+              <button type="button" class="example-chip" data-example="今天下雨有点冷，家里有土豆、胡萝卜和鸡腿肉，想吃暖和一点的。">
+                雨天暖胃
+              </button>
+              <button type="button" class="example-chip" data-example="天气很热，想吃清淡一点的午餐，最好 20 分钟内做好。">
+                清淡快手
+              </button>
+              <button type="button" class="example-chip" data-example="我只有番茄和鸡蛋，请推荐一道简单的午餐并告诉我做法。">
+                冰箱余料
+              </button>
+            </div>
+
+            <div class="form-footer">
+              <p class="privacy-note">
+                <span aria-hidden="true">●</span>
+                单轮测试，不保存输入与回答
+              </p>
+              <div class="action-group">
+                <label class="model-control" for="model-select">
+                  <span class="model-control-label">选择模型</span>
+                  <select id="model-select" name="provider" aria-label="选择本次推荐使用的模型">
+                    <option value="deepseek">DeepSeek · V4 Flash</option>
+                    <option value="mimo">MiMo · V2.5</option>
+                    <option value="kimi">Kimi · K2.6</option>
+                    <option value="nvidia">NVIDIA · GPT-OSS 20B</option>
+                  </select>
+                </label>
+                <button id="submit-button" class="primary-button" type="submit">
+                  <span>开始推荐</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <article id="result-card" class="result-card" aria-live="polite" aria-busy="false">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">AGENT RESPONSE</p>
+              <h2>推荐结果</h2>
+            </div>
+            <span id="result-state" class="result-state idle">等待输入</span>
+          </div>
+
+          <div id="result-empty" class="result-empty">
+            <div class="bowl-icon" aria-hidden="true">⌒</div>
+            <p>提交一次需求后，完整推荐会显示在这里。</p>
+            <small>运行摘要只展示步骤数、调用次数和耗时，不包含模型原始载荷。</small>
+          </div>
+
+          <div id="result-content" class="result-content" hidden>
+            <p id="model-used" class="model-used">
+              <span>本次模型</span>
+              <strong></strong>
+            </p>
+            <p id="answer" class="answer"></p>
+            <dl id="metrics" class="metrics" aria-label="脱敏运行摘要"></dl>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <span>FoodAssistant / branch-1-python-handwritten</span>
+      <span>只读工具 · 最多 8 步 · 付费回退关闭</span>
+    </footer>
+  </body>
+</html>

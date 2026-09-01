@@ -1,4 +1,4 @@
-"""Minimal NVIDIA OpenAI-compatible client built with the Python standard library."""
+"""Minimal OpenAI-compatible multi-provider client using the standard library."""
 
 from __future__ import annotations
 
@@ -50,7 +50,35 @@ def _classify_http_error(status_code: int) -> str:
     return "http_error"
 
 
-class NvidiaChatClient:
+def build_chat_payload(
+    settings: Settings,
+    messages: list[dict[str, Any]],
+    tool_schemas: list[dict[str, Any]],
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "model": settings.model,
+        "messages": messages,
+        "stream": False,
+    }
+    if settings.provider != "kimi":
+        payload["temperature"] = settings.temperature
+    if settings.provider == "mimo":
+        payload["max_completion_tokens"] = settings.max_output_tokens
+    else:
+        payload["max_tokens"] = settings.max_output_tokens
+    if settings.provider == "nvidia":
+        payload["reasoning_effort"] = settings.reasoning_effort
+    else:
+        # Non-thinking mode keeps tool turns compact and avoids
+        # provider-specific reasoning-message requirements.
+        payload["thinking"] = {"type": "disabled"}
+    if tool_schemas:
+        payload["tools"] = tool_schemas
+        payload["tool_choice"] = "auto"
+    return payload
+
+
+class OpenAICompatibleChatClient:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
 
@@ -59,17 +87,7 @@ class NvidiaChatClient:
         messages: list[dict[str, Any]],
         tool_schemas: list[dict[str, Any]],
     ) -> ChatResponse:
-        payload: dict[str, Any] = {
-            "model": self._settings.model,
-            "messages": messages,
-            "temperature": self._settings.temperature,
-            "max_tokens": self._settings.max_output_tokens,
-            "reasoning_effort": self._settings.reasoning_effort,
-            "stream": False,
-        }
-        if tool_schemas:
-            payload["tools"] = tool_schemas
-            payload["tool_choice"] = "auto"
+        payload = build_chat_payload(self._settings, messages, tool_schemas)
 
         request = Request(
             f"{self._settings.base_url}/chat/completions",
@@ -79,7 +97,7 @@ class NvidiaChatClient:
                 "Authorization": f"Bearer {self._settings.api_key}",
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "User-Agent": "FoodAssistant-Handwritten/0.1",
+                "User-Agent": f"FoodAssistant-Handwritten/0.2 ({self._settings.provider})",
             },
         )
         started = time.perf_counter()
@@ -90,25 +108,25 @@ class NvidiaChatClient:
         except HTTPError as exc:
             raise ModelClientError(
                 _classify_http_error(exc.code),
-                "NVIDIA API rejected the request",
+                "Model provider rejected the request",
                 status_code=exc.code,
             ) from exc
         except (TimeoutError, URLError) as exc:
             raise ModelClientError(
-                "timeout", "NVIDIA API could not be reached before the timeout"
+                "timeout", "Model provider could not be reached before the timeout"
             ) from exc
 
         latency_ms = round((time.perf_counter() - started) * 1000)
         if status_code == 202:
             raise ModelClientError(
                 "provider_pending",
-                "NVIDIA API returned an asynchronous response that this MVP does not poll",
+                "Model provider returned an asynchronous response that this MVP does not poll",
                 status_code=status_code,
             )
         if status_code != 200:
             raise ModelClientError(
                 _classify_http_error(status_code),
-                "NVIDIA API returned an unexpected status",
+                "Model provider returned an unexpected status",
                 status_code=status_code,
             )
 
@@ -119,11 +137,11 @@ class NvidiaChatClient:
             raw_message = first_choice["message"]
         except (UnicodeDecodeError, json.JSONDecodeError, KeyError, IndexError, TypeError) as exc:
             raise ModelClientError(
-                "invalid_response", "NVIDIA API returned an invalid response shape"
+                "invalid_response", "Model provider returned an invalid response shape"
             ) from exc
         if not isinstance(raw_message, dict):
             raise ModelClientError(
-                "invalid_response", "NVIDIA API returned a non-object message"
+                "invalid_response", "Model provider returned a non-object message"
             )
 
         message: dict[str, Any] = {
@@ -150,3 +168,7 @@ class NvidiaChatClient:
             usage=usage,
             finish_reason=finish_reason,
         )
+
+
+# Backward-compatible name for existing imports and learning notes.
+NvidiaChatClient = OpenAICompatibleChatClient

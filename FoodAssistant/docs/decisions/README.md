@@ -10,3 +10,5 @@ ADR 用于记录重要设计选择及其原因，避免项目迭代后只看到�
 - [0002：付费模型回退必须显式开启](0002-explicit-paid-fallback.md)
 - [0003：本地密钥使用文件指针](0003-local-secret-file-pointers.md)
 - [0004：手写分支优先使用 Python 标准库](0004-handwritten-standard-library-client.md)
+- [0005：分支 1 使用本地标准库 Web 测试入口](0005-local-web-quick-test-surface.md)
+- [0006：Web 供应商切换使用逐请求白名单](0006-web-model-selection-uses-an-allowlist.md)
