@@ -9,7 +9,7 @@
 - NVIDIA、DeepSeek、MiMo、Kimi 的安全配置与 OpenAI 兼容 HTTP 客户端；
 - 四个共享只读工具、统一参数校验、结构化错误与调用缓存；
 - 显式 Agent Loop、最多 8 步、重复调用保护和有界降级回答；
-- 命令行入口、脱敏事件日志、Token 与耗时摘要；
+- 命令行入口、本地 Web 快速测试台、脱敏事件日志、Token 与耗时摘要；
 - 25 道菜谱、模拟库存、共享评测用例和离线单元测试。
 
 ## 文件导览
@@ -29,8 +29,8 @@
 ## 本地配置
 
 1. 复制 `../.env.example` 为本地 `../.env`。该文件已被 Git 忽略。
-2. 推荐只设置 `NVIDIA_API_KEY_FILE`，指向仓库内白名单文件 `APIKEY/nvidia-api-key.md`；不要把密钥复制进配置、命令、聊天或日志。
-3. 命令行默认保持 `MODEL_PROVIDER=nvidia`；Web 测试页可由用户逐次显式选择 DeepSeek、MiMo、Kimi 或 NVIDIA。始终保持 `PAID_FALLBACK_ENABLED=false`，请求失败时不会自动切换供应商。
+2. 命令行默认使用 NVIDIA，推荐设置 `NVIDIA_API_KEY_FILE`；要在 Web 测试其他供应商，再配置对应的 `DEEPSEEK_*`、`MIMO_*` 或 `KIMI_*`。密钥文件必须使用 `APIKEY/` 中各供应商的白名单文件，不要把密钥复制进配置、命令、聊天或日志。
+3. 命令行默认保持 `MODEL_PROVIDER=nvidia`；Web 测试页由用户逐次显式选择供应商。始终保持 `PAID_FALLBACK_ENABLED=false`，请求失败时不会自动切换供应商。
 
 `AGENT_REASONING_EFFORT` 默认为 `low`。这个任务的工具选择很简单，低推理强度可减少推理 Token 和延迟，并给最终中文回答留出输出空间。
 
@@ -55,6 +55,15 @@
 ```
 
 然后打开 `http://127.0.0.1:8000`。页面复用同一个 Agent Loop，每次提交都是独立单轮运行；可在提交按钮左侧显式切换 DeepSeek、MiMo、Kimi 或 NVIDIA，并在结果中核对实际供应商与模型。页面只展示最终回答和脱敏摘要；详细边界见 [web/README.md](web/README.md)。
+
+| 页面选项 | 固定 Web 模型 |
+|---|---|
+| DeepSeek · V4 Flash | `deepseek-v4-flash` |
+| MiMo · V2.5 | `mimo-v2.5` |
+| Kimi · K2.6 | `kimi-k2.6` |
+| NVIDIA · GPT-OSS 20B | `openai/gpt-oss-20b` |
+
+页面启动时会读取公开的配置状态并禁用未配置项。模型 ID 由服务端白名单固定，浏览器不能提交任意模型；任一请求失败时只显示该供应商的错误，不进行自动回退。
 
 ## 离线测试
 

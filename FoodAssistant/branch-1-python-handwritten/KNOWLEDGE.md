@@ -40,13 +40,20 @@ branch-1-python-handwritten/
 ├── tools.py          # 数据加载 + 四个工具 + 工具注册表 + 结果缓存
 ├── agent.py          # 手写 Agent Loop（核心循环）
 ├── web/              # 本地 Web 快速测试页与供应商选择入口
+│   ├── server.py     # 标准库 HTTP 服务、接口校验、Agent 组装
+│   ├── index.html    # 单页界面结构
+│   ├── styles.css    # 页面样式与响应式布局
+│   ├── app.js        # 供应商列表加载、表单提交、结果展示
+│   └── README.md     # Web 启动方法与安全边界
 ├── KNOWLEDGE.md      # 本文档
 ├── requirements.txt  # 空依赖声明（只用标准库）
 └── tests/            # 不联网的单元测试（unittest）
     ├── __init__.py
     ├── test_config.py
     ├── test_tools.py
-    └── test_agent.py
+    ├── test_agent.py
+    ├── test_model_client.py
+    └── test_web.py
 ```
 
 调用关系（谁 import 谁）：
@@ -59,9 +66,19 @@ main.py
   └── agent.py         （HandwrittenAgent、AgentError）
         ├── model_client.py  （ChatResponse、ModelClientError）
         └── tools.py         （ToolExecution、ToolRegistry）
+
+web/server.py
+  ├── config.py        （按本次选择加载供应商）
+  ├── model_client.py  （OpenAICompatibleChatClient）
+  ├── tools.py         （每次请求创建独立 ToolRegistry）
+  └── agent.py         （每次请求创建独立 HandwrittenAgent）
+
+浏览器 app.js
+  ├── GET /api/providers  （读取公开模型列表与配置状态）
+  └── POST /api/chat      （提交 message + provider）
 ```
 
-依赖是单向的：`config` 最底层，`agent` 把 `tools` 和 `model_client` 组合起来，`main` 负责把它们串成一条可运行的线。
+依赖是单向的：`config` 最底层，`agent` 把 `tools` 和 `model_client` 组合起来，`main` 与 `web/server.py` 是两个入口。它们复用同一个 Agent Loop，不存在第二套 Web 专用业务逻辑。
 
 数据来源（在分支文件夹之外，代码只读它们，从不修改）：
 
@@ -71,6 +88,8 @@ main.py
 ---
 
 ## 3. 整条执行流程（一次完整运行）
+
+### 3.1 命令行入口
 
 `main.py` 被运行后会发生这些事：
 
@@ -83,6 +102,18 @@ main.py
 7. **退出码**：完成返回 `0`，模型失败返回 `1`，配置/数据错误返回 `2`，到步数上限未完成返回 `3`。
 
 > 关键点：模型自己**不会**执行工具。它只是"提议"要调用哪个工具、传什么参数（`tool_calls`）。真正执行工具的是 `tools.py` 里的 Python 代码，结果再以消息形式喂回模型。这个分工就是 Agent 安全性的基础——模型永远碰不到文件系统、密钥，只能调用白名单里的只读函数。
+
+### 3.2 Web 入口
+
+Web 页面没有绕过上述流程，只是在 Agent 外面增加一层很薄的 HTTP 适配：
+
+1. 页面加载后请求 `GET /api/providers`，服务端只返回供应商 ID、显示名称、固定 Web 模型 ID 和是否已配置；密钥与端点不会进入浏览器。
+2. 用户从 DeepSeek、MiMo、Kimi、NVIDIA 中选择一个供应商，提交 `{message, provider}` 到 `POST /api/chat`。
+3. 服务端再次校验供应商白名单、配置可用性、JSON 类型、请求大小与 2000 字输入上限；不能只相信下拉框。
+4. `run_agent()` 按本次选择调用 `load_settings(provider_override=..., model_override=...)`，然后创建独立的客户端、工具注册表与 `HandwrittenAgent`。
+5. 服务端只返回最终回答和脱敏摘要；摘要中的 `provider`、`model` 是实际调用值，页面据此回显。
+
+Web 每次提交都是独立单轮运行，最多同时处理两个 Agent 请求。某家供应商失败时直接显示类型化错误，不会自动改用下一家。
 
 ---
 
@@ -149,6 +180,17 @@ PROVIDER_KEY_FILES = {供应商: APIKEY_ROOT / 对应白名单文件名}
 - `PAID_FALLBACK_ENABLED` 必须是 `false`（付费回退未实现，直接拒绝）
 
 命令行读取 `MODEL_PROVIDER`；Web 测试页则把用户本次明确选择的供应商作为受限覆盖值。两种入口都只执行所选供应商，不会自动回退。
+
+Web 不直接接受浏览器传入模型 ID，而是为四个供应商绑定固定白名单：
+
+| 供应商 ID | Web 显示 | 固定模型 ID |
+|---|---|---|
+| `deepseek` | DeepSeek V4 Flash | `deepseek-v4-flash` |
+| `mimo` | MiMo V2.5 | `mimo-v2.5` |
+| `kimi` | Kimi K2.6 | `kimi-k2.6` |
+| `nvidia` | NVIDIA GPT-OSS 20B | `openai/gpt-oss-20b` |
+
+这样可以防止浏览器提交任意或陈旧的模型名。缺少对应合法配置时，该选项由 `/api/providers` 标记为不可用，并在页面中禁用。
 
 ### 4.7 设计意图总结
 
@@ -340,9 +382,32 @@ Agent 运行时会打印过程日志，但这个日志类有一条铁律：**只
 
 ---
 
-## 9. `tests/` —— 不联网的单元测试
+## 9. `web/` —— 本地快速测试界面
 
-三个测试文件都用标准库 `unittest`，并且遵守同一条原则：**不联网、不读取 APIKEY 和本地 .env**。通过两个手法实现：
+### 9.1 `server.py`：最薄的 HTTP 适配层
+
+服务基于标准库 `ThreadingHTTPServer`，固定监听 `127.0.0.1`。它只提供静态文件和两个 JSON 接口：
+
+| 接口 | 作用 | 关键边界 |
+|---|---|---|
+| `GET /api/providers` | 返回四个固定选项及配置状态 | 不返回密钥、请求头或真实配置路径 |
+| `POST /api/chat` | 运行一次独立 Agent 请求 | 只收 JSON；校验供应商；输入最多 2000 字；并发最多 2 个 |
+
+响应带有 CSP、`X-Content-Type-Options` 等安全头。错误统一返回公开的 `error.type` 与安全消息，不把堆栈、模型原始载荷或凭据暴露给页面。
+
+### 9.2 `app.js`：显示状态，不决定安全策略
+
+前端会根据 `/api/providers` 重建下拉列表并禁用未配置项，提交期间锁住输入和模型选择，成功后展示实际供应商、模型、步骤数、工具调用数和耗时。前端校验只是为了体验；真正的白名单与长度校验仍在服务端执行。
+
+### 9.3 为什么不用 Web 框架？
+
+这个分支的学习变量是“手写 Agent Loop”。测试台继续使用 Python 标准库，可以避免同时引入 Flask/FastAPI、构建工具和前端框架，让读者把注意力放在请求如何进入同一个 Agent 上。它是本地开发入口，不是生产服务器。
+
+---
+
+## 10. `tests/` —— 不联网的单元测试
+
+五个测试文件都用标准库 `unittest`，并且遵守同一条原则：**不联网、不读取 APIKEY 和本地 .env**。主要覆盖：
 
 - `test_config.py`：用 `tempfile.TemporaryDirectory` 造临时 .env；直接构造 `Settings` 验证 repr 不含密钥。
 - `test_tools.py`：直接加载真实菜谱库（`RecipeRepository()`），验证数据质量和工具行为——比如"冷雨天土豆胡萝卜的查询应该把『胡萝卜土豆炖鸡』排在结果里"。
@@ -354,12 +419,14 @@ Agent 运行时会打印过程日志，但这个日志类有一条铁律：**只
   - `finish_reason == "length"` 不算完成
   - gpt-oss 的 `<|channel|>` 后缀被正确移除
   - 危险工具名（带换行）在日志和执**行之前**就被拒绝
+- `test_model_client.py`：直接检查四家供应商必要的 payload 差异，不发网络请求。
+- `test_web.py`：在随机本机端口启动注入假 Runner 的 HTTP 服务，验证安全头、四供应商列表、显式 NVIDIA 选择、错误状态和输入上限。
 
 测试里 `sys.path.insert` 把 branch 目录加入搜索路径，这样 `from config import ...` 才能工作。
 
 ---
 
-## 10. 运行与测试
+## 11. 运行与测试
 
 在**仓库根目录**执行（README 用的是本机绝对路径的 Python，下面是通用写法）：
 
@@ -373,15 +440,18 @@ python FoodAssistant/branch-1-python-handwritten/main.py
 # 关闭过程日志
 python FoodAssistant/branch-1-python-handwritten/main.py "..." --quiet
 
+# 启动只监听 127.0.0.1:8000 的 Web 测试台
+python FoodAssistant/branch-1-python-handwritten/web/server.py
+
 # 跑全部离线测试
 python -m unittest discover -s FoodAssistant/branch-1-python-handwritten/tests -v
 ```
 
-运行前需要 `FoodAssistant/.env`（参考 `FoodAssistant/.env.example`）。推荐只设 `NVIDIA_API_KEY_FILE` 指向 `APIKEY/nvidia-api-key.md`，不要把密钥写进配置、命令行或聊天内容。
+运行前需要 `FoodAssistant/.env`（参考 `FoodAssistant/.env.example`）。命令行默认使用 NVIDIA；Web 至少需要配置想测试的供应商，未配置项会被禁用。推荐使用各供应商的 `*_API_KEY_FILE` 指向对应白名单文件，不要把密钥写进配置、命令行或聊天内容。
 
 ---
 
-## 11. 贯穿全项目的设计主题（值得反复品味）
+## 12. 贯穿全项目的设计主题（值得反复品味）
 
 把四个模块连起来看，能发现几个一致的设计哲学：
 
@@ -391,12 +461,12 @@ python -m unittest discover -s FoodAssistant/branch-1-python-handwritten/tests -
 4. **错误是类型化的，不是随便一个字符串。** `ConfigurationError` / `DatasetError` / `ModelClientError` / `AgentError`，每一层都把自己的问题翻译成上层能理解的语言。
 5. **可测试性优先。** 用 `Protocol` + 假客户端，让"Agent 循环"这个抽象概念可以在不联网的情况下被完整验证。
 
-## 12. 给初学者的阅读路线建议
+## 13. 给初学者的阅读路线建议
 
 - 第一次读：从 `main.py` 开始看它组装了谁 → 再读 `config.py` 了解"启动前的检查" → 然后直接读 `agent.py` 的 `run()`，边读边对照第 3 节的流程图。
 - 第二次读：回到 `tools.py`，重点理解 `execute()` 的校验-缓存-执行三件事，以及 `search_recipes` 的打分算法。
 - 第三次读：`model_client.py` 对照官方 `/chat/completions` 接口文档逐字段核对，这是"标准库实现 API 客户端"的最佳教材。
-- 最后：跑一遍测试，把 `test_agent.py` 里每个测试名和 `agent.py` 的哪个防御逻辑对应起来。
+- 最后：从 `web/server.py` 沿 `/api/chat` 跟进 `HandwrittenAgent`，确认 Web 与命令行如何汇合；再跑一遍测试，把每个测试名和对应防御逻辑关联起来。
 
 读完后可以试着自己做的小改动（改完务必跑测试）：
 

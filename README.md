@@ -2,7 +2,7 @@
 
 这是一个面向 Agent 开发初学者的学习与设计仓库。当前主项目是“美食小助手 Agent”，目标是用同一需求对照学习手写 Agent Loop、LangGraph 编排和 TypeScript 实现。
 
-> 当前阶段：**分支 1 已形成可运行初版，正在完成真实模型验证；分支 2、3 仍为学习骨架。**
+> 当前阶段：**分支 1 已形成可运行初版，包含命令行入口、本地 Web 测试台和四供应商显式切换；分支 2、3 仍为学习骨架。**
 
 ## 安全红线
 
@@ -21,6 +21,7 @@
 | [Knowledge.md](Knowledge.md) | 从企业岗位资料整理的 Agent 知识索引 |
 | `Agent/`、`Harness/`、`Infra/`、`Runtime/` | 不同 Agent 工程方向的调研资料 |
 | [FoodAssistant/README.md](FoodAssistant/README.md) | 美食小助手项目入口 |
+| [FoodAssistant/branch-1-python-handwritten/KNOWLEDGE.md](FoodAssistant/branch-1-python-handwritten/KNOWLEDGE.md) | 分支 1 代码、Web 流程与测试学习指南 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | GitHub 协作与变更规范 |
 
 ## 推荐学习顺序
@@ -33,7 +34,7 @@
 
 ## 当前实现选择
 
-- 分支 1 命令行默认通过 NVIDIA 的 OpenAI 兼容接口运行；本地 Web 测试页允许用户显式选择 DeepSeek、MiMo 或 Kimi。
+- 分支 1 命令行默认通过 NVIDIA 的 OpenAI 兼容接口运行；本地 Web 测试页允许用户显式选择 DeepSeek、MiMo、Kimi 或 NVIDIA。
 - 自动切换付费模型保持关闭；任何供应商切换都来自用户本次请求的明确选择，不进行静默回退。
 
 ## 许可证
